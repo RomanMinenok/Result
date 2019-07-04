@@ -1,0 +1,2 @@
+# Result
+Result holder library
