@@ -26,11 +26,39 @@ class ResultSuccessTests {
     }
 
     @Test
-    fun `success result calls success block`() {
+    fun `fail result does not take default`() {
+        val init = "Hello"
+        val default = "World"
+        val result = Result.error(init)
+        assert(result.errorOrDefault(default) != default)
+    }
+
+    @Test
+    fun `success result calls onSuccess block`() {
         var called = false
 
         val result = Result.success("Hello")
         result.onSuccess { called = true }
+
+        assert(called)
+    }
+
+    @Test
+    fun `success result calls withSuccess block`() {
+        var called = false
+
+        val result = Result.success("Hello")
+        result.withSuccess { called = true }
+
+        assert(called)
+    }
+
+    @Test
+    fun `success result calls doIfSuccess block`() {
+        var called = false
+
+        val result = Result.success("Hello")
+        result.doIfSuccess { called = true }
 
         assert(called)
     }
@@ -98,11 +126,38 @@ class ResultFailureTest {
     }
 
     @Test
-    fun `failure result calls error block`() {
+    fun `success result calls default`() {
+        val default = "World"
+        val result = Result.success("Hello")
+        assert(result.errorOrDefault(default) == default)
+    }
+
+    @Test
+    fun `failure result calls onError block`() {
         var called = false
 
         val result = Result.error("Hello")
         result.onError { called = true }
+
+        assert(called)
+    }
+
+    @Test
+    fun `failure result calls withError block`() {
+        var called = false
+
+        val result = Result.error("Hello")
+        result.withError { called = true }
+
+        assert(called)
+    }
+
+    @Test
+    fun `failure result calls doIfError block`() {
+        var called = false
+
+        val result = Result.error("Hello")
+        result.doIfError { called = true }
 
         assert(called)
     }
@@ -176,20 +231,14 @@ class ResultEmptyTests {
         casted.getOrThrow()
     }
 
-    @Test
+    @Test(expected = IllegalStateException::class)
     fun `casted empty result works properly, not as failure`() {
         val casted: Result<Unit, Throwable> = Result.success()
 
         assert(!casted.isFailure)
         assert(casted.error() == null)
 
-        var caught: Throwable? = null
-        try {
-            casted.errorOrThrow()
-        } catch (e: Throwable) {
-            caught = e
-        }
-        assert(caught is IllegalStateException)
+        casted.errorOrThrow()
     }
 
     @Test
@@ -210,5 +259,21 @@ class ResultEmptyTests {
         val mapped = result.mapError { final }
 
         assert(mapped.errorOrThrow() == final)
+    }
+
+    @Test
+    fun `tryWithResult returns value`() {
+        val value = "hello"
+        val result = tryWithResult { value }
+
+        assert(result.get() == value)
+    }
+
+    @Test
+    fun `tryWithResult catches error`() {
+        val exception = IllegalStateException()
+        val result = tryWithResult { throw exception }
+
+        assert(result.error() == exception)
     }
 }
