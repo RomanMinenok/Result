@@ -16,6 +16,11 @@ operator fun <T, E> Result<T, E>.component1(): T? = get()
 
 operator fun <T, E> Result<T, E>.component2(): E? = error()
 
+fun <T, E> Result<T, E>.swap(): Result<E, T> = when {
+    isSuccess -> Result.error(getOrThrow())
+    else -> Result.success(errorOrThrow())
+}
+
 inline fun <T, E> Result<T, E>.onSuccess(action: (T) -> Unit): Result<T, E> {
     if (isSuccess) {
         action(getOrThrow())
