@@ -61,10 +61,11 @@ result.onSuccess { name -> println(name) }
     .onError { error -> println(error) }
     .withSuccess { println(this) }
     .withError { println(this) }
-    .getOrDefault { "hello" }
-    .errorOrDefault { IllegalStateException() }
  
+ result.getOrDefault { "hello" } // safe, returns default if error
  result.getOrDefault("hello") // safe, returns default if error
+ 
+ result.errorOrDefault { IllegalStateException() } // safe, returns default if success
  result.errorOrDefault(IllegalStateException()) // safe, returns default if success
 
 ```
