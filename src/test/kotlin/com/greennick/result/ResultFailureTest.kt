@@ -119,4 +119,62 @@ class ResultFailureTest {
         assert(swapped.isSuccess)
         assert(swapped.get() == init)
     }
+
+    @Test
+    fun `map to list`() {
+        val result: Result<Int, String> = Result.error("hello")
+        val list: List<Int> = result.toList()
+
+        assert(list.isEmpty())
+    }
+
+    @Test
+    fun `map to error list`() {
+        val init = "hello"
+        val result: Result<Int, String> = Result.error(init)
+        val list: List<String> = result.toErrorList()
+
+        assert(list.size == 1)
+        assert(list.first() == init)
+    }
+
+    @Test
+    fun `list of success items mapping to empty list`() {
+        val list = listOf<Result<Int, String>>(
+            Result.success(1),
+            Result.success(0),
+            Result.success(1),
+            Result.success(5)
+        )
+
+        assert(list.toErrorList().isEmpty())
+    }
+
+    @Test
+    fun `list of mixed items mapping to list`() {
+        val list = listOf(
+            Result.success(1),
+            Result.error("Hello"),
+            Result.success(1),
+            Result.error("World")
+        )
+
+        val mapped = list.toErrorList()
+        assert(mapped.size == 2)
+        assert(mapped == listOf("Hello", "World"))
+    }
+
+    @Test
+    fun `list of error items mapping to list`() {
+        val list = listOf<Result<String, Int>>(
+            Result.error(1),
+            Result.error(0),
+            Result.error(1),
+            Result.error(5)
+        )
+
+        val mapped = list.toErrorList()
+        assert(mapped.size == 4)
+        assert(mapped == listOf(1, 0, 1, 5))
+    }
 }

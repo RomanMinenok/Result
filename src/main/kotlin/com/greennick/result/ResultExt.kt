@@ -151,6 +151,44 @@ inline fun <T, E, R> Result<T, E>.mapError(transformer: (E) -> R): Result<T, R> 
     flatMapError { Result.error(transformer(it)) }
 
 /**
+ * Returns [List] of single success item of type [T] if given [Result] is success.
+ * Returns [emptyList] otherwise.
+ */
+fun <T> Result<T, *>.toList(): List<T> {
+    return if (isSuccess) listOf(getOrThrow()) else emptyList()
+}
+
+/**
+ * Returns [List] of single error item of type [E] if given [Result] is failure.
+ * Returns [emptyList] otherwise.
+ */
+fun <E> Result<*, E>.toErrorList(): List<E> {
+    return if (isFailure) listOf(errorOrThrow()) else emptyList()
+}
+
+/**
+ * Map given [List] of [Result]s to [List] of success items only.
+ */
+fun <T> List<Result<T, *>>.toSuccessList(): List<T> {
+    return mutableListOf<T>().apply {
+        this@toSuccessList.forEach {
+            if (it.isSuccess) add(it.getOrThrow())
+        }
+    }
+}
+
+/**
+ * Map given [List] of [Result]s to [List] of error items only.
+ */
+fun <E> List<Result<*, E>>.toErrorList(): List<E> {
+    return mutableListOf<E>().apply {
+        this@toErrorList.forEach {
+            if (it.isFailure) add(it.errorOrThrow())
+        }
+    }
+}
+
+/**
  * Call [action] wrapped in try-catch block.
  *
  * @return Result with [action]`s value or with caught exception.

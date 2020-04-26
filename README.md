@@ -16,7 +16,7 @@ Representing error:
 `val error: Result<Nothing, Throwable> = Result.error(IllegalStateException("wrong action))`
 
 try-catch replacement:  
-```
+```kotlin
 val result: Result<Int, Throwable> = tryWithResult {
     "hello".toInt()
 }
@@ -26,7 +26,7 @@ result.error() == NumberFormatException
 It'll catch all thrown `Throwable`s
 
 Because of using `Nothing` as representation of missing type, you can safely cast `Result` to any needed type:
-```
+```kotlin
 fun loadUser(): Result<User, Throwable> {
    val result: Result<User, Nothing> = Result.success(User())
    return result // this works fine despite function requires Result<User, Throwable> return type
@@ -36,7 +36,7 @@ fun loadUser(): Result<User, Throwable> {
 ### Getting result:
 There are few ways to get result from `Result` object.  
 Native are:
-```
+```kotlin
 val success = Result.success("hello")
 success.getOrThrow() == "hello"
 
@@ -48,8 +48,8 @@ To prevent this you can use checks:
 `result.isSuccess` and `result.isFailure`
 
 Besides that you can use another extensions to unwrap value:
-```
-val result: Result<String, Throwable> = ...
+```kotlin
+val result: Result<String, Throwable> = loadSth()
 
 val name = result.get() // safe, returns nullable
 val error = result.error() // safe, returns nullable
