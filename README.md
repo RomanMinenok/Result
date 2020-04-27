@@ -1,8 +1,8 @@
 [![](https://jitpack.io/v/green-nick/Result.svg)](https://jitpack.io/#green-nick/Result)
 # Result
-Small class and extensions that are used as some result holder.
-In fact this is Either monad implementation, but oriented on "results".
-Unlike Kotlin's default Result could be used without any compiler flags and error part could be any object.
+Small class that is used as result holder (Success or Failure) and extensions on top of it.
+In fact this is Either monad implementation, but instead of "Right" and "Left" it contains of "Success" and "Failure".
+Unlike Kotlin's default Result could be used without any compiler flags and any object could be used as error part.
 
 ## Usage
 ### Initialization:
@@ -49,7 +49,7 @@ To prevent this you can use checks:
 
 Besides that you can use another extensions to unwrap value:
 ```kotlin
-val result: Result<String, Throwable> = loadSth()
+val result: Result<String, Throwable> = loadUserName()
 
 val name = result.get() // safe, returns nullable
 val error = result.error() // safe, returns nullable
@@ -67,7 +67,23 @@ result.onSuccess { name -> println(name) }
  
  result.errorOrDefault { IllegalStateException() } // safe, returns default if success
  result.errorOrDefault(IllegalStateException()) // safe, returns default if success
+```
 
+There are some extensions to work with Lists:
+```kotlin
+val result: Result<String, Throwable> = loadUserName()
+
+val list: List<String> = result.toList() // returns List with single success element or empty list
+val listOfError: List<Throwable> = result.toErrorList() // works opposite to above
+```
+
+Let's imagine we have some list of Results. 
+If you need, you can map and filter it into list of success or failed items:
+```kotlin
+val results: List<Result<String, Throwable>> = loadUserNames()
+
+val successItems: List<String> = results.toSuccessList()
+val failedItems: List<Throwable> = results.toErrorList()
 ```
 ### Modifications:
 You can use such modifiers as:  
